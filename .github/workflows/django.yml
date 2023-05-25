@@ -11,9 +11,9 @@ env:
   RANDOM_SEED: ${{ github.run_id }}
 
 jobs:
-  build:
-
+  tests:
     runs-on: ubuntu-latest
+    environment: Test
     strategy:
       fail-fast: false
       matrix:
@@ -53,3 +53,15 @@ jobs:
         chmod +x runtests.sh
         ./runtests.sh
         exit 0
+
+  coverage:
+    needs: tests
+    environment: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@v2
+        with:
+          parallel-finished: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          debug: true
