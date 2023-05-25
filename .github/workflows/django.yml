@@ -62,6 +62,5 @@ jobs:
       - name: Coveralls Finished
         uses: coverallsapp/github-action@v2
         with:
-          parallel-finished: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
           debug: true
