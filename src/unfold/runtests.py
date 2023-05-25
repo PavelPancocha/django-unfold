@@ -16,7 +16,7 @@ def print_versions():
 
 
 def setup_django():
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "unfold.settings")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "unfold.settings_development")
     django.setup()
 
 

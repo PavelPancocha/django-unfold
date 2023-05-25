@@ -51,7 +51,7 @@ ignore = [
 [tool.poetry.dependencies]
 python = "~=3.8"
 django = ">=4.2,<4.3"
-coverage = "^7.2.6"
+coverage = {extras = ["toml"], version = "^7.2.6"}
 
 [tool.poetry.group.testing]
 optional = true
