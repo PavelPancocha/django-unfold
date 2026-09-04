@@ -337,25 +337,74 @@ function searchCommand() {
 				this.handleOpen();
 			}
 		},
+		resetSearchResults() {
+			this.el.replaceChildren();
+			document.getElementById("command-results-note").replaceChildren();
+			this.hasResponse = false;
+			this.searchTerm = "";
+			this.items = document.querySelectorAll("#command-history li");
+			this.totalItems = this.items.length;
+			this.currentIndex = 0;
+		},
+		abortSearch() {
+			htmx.trigger(this.$refs.searchInputCommand, "htmx:abort");
+		},
+		dispatchSearchInput() {
+			this.$refs.searchInputCommand.dispatchEvent(
+				new Event("input", { bubbles: true }),
+			);
+		},
+		handleSearchConfigRequest(event) {
+			const searchTerm = this.$refs.searchInputCommand.value.trim();
+
+			if (
+				searchTerm.length <
+				Number(this.$refs.searchInputCommand.minLength)
+			) {
+				event.preventDefault();
+			}
+		},
+		getSubmittedSearchTerm(event) {
+			return (
+				new URL(
+					event.detail.xhr.responseURL,
+					window.location.origin,
+				).searchParams.get("s") || ""
+			);
+		},
+		handleSearchInput(_event) {
+			this.abortSearch();
+			this.resetSearchResults();
+		},
+		handleSearchBeforeSwap(event) {
+			const submittedSearchTerm =
+				this.getSubmittedSearchTerm(event);
+
+			if (submittedSearchTerm !== this.$refs.searchInputCommand.value) {
+				event.preventDefault();
+			}
+		},
 		handleClear() {
+			this.abortSearch();
+
 			if (this.$refs.searchInputCommand.value === "") {
 				this.openCommandResults = false;
-				this.el.innerHTML = "";
-				this.searchTerm = "";
-				this.items = undefined;
-				this.totalItems = 0;
-				this.currentIndex = 0;
+				this.resetSearchResults();
 			} else {
 				this.$refs.searchInputCommand.value = "";
+				this.dispatchSearchInput();
+				this.resetSearchResults();
 			}
 		},
 		handleOutsideClick() {
+			this.abortSearch();
+			const hadSearchTerm = this.$refs.searchInputCommand.value !== "";
 			this.$refs.searchInputCommand.value = "";
-			this.searchTerm = "";
+			if (hadSearchTerm) {
+				this.dispatchSearchInput();
+			}
 			this.openCommandResults = false;
-			this.items = undefined;
-			this.totalItems = 0;
-			this.currentIndex = 0;
+			this.resetSearchResults();
 		},
 		handleContentLoaded(event) {
 			if (
